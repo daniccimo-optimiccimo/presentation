@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Математическая статистика - Вариант 6</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body>
+    <div class="presentation-container">
+        <nav class="navbar">
+            <button onclick="prevSlide()" class="nav-btn">←</button>
+            <span id="slide-number">1</span>/<span id="total-slides">22</span>
+            <button onclick="nextSlide()" class="nav-btn">→</button>
+            <select id="slide-selector" onchange="goToSlide(this.value)">
+                <option value="1">Слайд 1</option>
+                <option value="2">Слайд 2</option>
+                <option value="3">Слайд 3</option>
+                <option value="4">Слайд 4</option>
+                <option value="5">Слайд 5</option>
+                <option value="6">Слайд 6</option>
+                <option value="7">Слайд 7</option>
+                <option value="8">Слайд 8</option>
+                <option value="9">Слайд 9</option>
+                <option value="10">Слайд 10</option>
+                <option value="11">Слайд 11</option>
+                <option value="12">Слайд 12</option>
+                <option value="13">Слайд 13</option>
+                <option value="14">Слайд 14</option>
+                <option value="15">Слайд 15</option>
+                <option value="16">Слайд 16</option>
+                <option value="17">Слайд 17</option>
+                <option value="18">Слайд 18</option>
+                <option value="19">Слайд 19</option>
+                <option value="20">Слайд 20</option>
+                <option value="21">Слайд 21</option>
+                <option value="22">Слайд 22</option>
+            </select>
+        </nav>
+
+        <div class="slides-container">
+            <!-- Слайд 1: Титульный -->
+            <div class="slide active" id="slide1">
+                <h1>Математическая статистика</h1>
+                <h2>Вариант №6</h2>
+                <div class="title-info">
+                    <p><strong>Выполнил:</strong> Селивёрстов Д.Д.</p>
+                    <p><strong>Проверил:</strong> Мачтаков А.В.</p>
+                    <p><strong>Год:</strong> 2025</p>
+                </div>
+            </div>
+
+            <!-- Слайд 2: Определение -->
+            <div class="slide" id="slide2">
+                <h2>Определение математической статистики</h2>
+                <div class="definition-card">
+                    <p>Раздел математики, разрабатывающий методы сбора, систематизации, обработки и использования статистических данных.</p>
+                </div>
+                <div class="content-box">
+                    <h3>Основные задачи:</h3>
+                    <ul>
+                        <li>Оценка неизвестных параметров</li>
+                        <li>Проверка статистических гипотез</li>
+                        <li>Установление взаимосвязей</li>
+                        <li>Прогнозирование на основе данных</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Слайд 3: Выборка -->
+            <div class="slide" id="slide3">
+                <h2>Выборка</h2>
+                <div class="definition-card">
+                    <p>Конечный набор объектов, случайно отобранных из генеральной совокупности.</p>
+                </div>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>Пример 1:</h3>
+                        <p>Рост студентов (см):</p>
+                        <code>[175, 168, 182, 170, 165]</code>
+                    </div>
+                    <div class="column">
+                        <h3>Пример 2:</h3>
+                        <p>Оценки студентов:</p>
+                        <code>[5, 4, 3, 5, 4, 4]</code>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Типы выборок:</h3>
+                    <ul>
+                        <li>Простая случайная</li>
+                        <li>Стратифицированная</li>
+                        <li>Систематическая</li>
+                        <li>Кластерная</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Слайд 4: Выборочная средняя -->
+            <div class="slide" id="slide4">
+                <h2>Выборочная средняя</h2>
+                <div class="definition-card">
+                    <p>Сумма всех элементов выборки, делённая на их количество.</p>
+                    <div class="formula">$$\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$$</div>
+                </div>
+                <div class="example-box">
+                    <h3>Пример:</h3>
+                    <p><code>[5, 8, 3, 9, 5]</code></p>
+                    <p>$$\frac{5 + 8 + 3 + 9 + 5}{5} = \frac{30}{5} = 6$$</p>
+                    <p>Среднее = <strong>6</strong></p>
+                </div>
+                <button onclick="calculateMeanInteractive()" class="action-btn">Посчитать</button>
+                <div id="mean-result" class="result-box"></div>
+            </div>
+
+            <!-- Слайд 5: Медиана -->
+            <div class="slide" id="slide5">
+                <h2>Медиана</h2>
+                <div class="definition-card">
+                    <p>Значение, которое делит упорядоченную выборку на две равные части.</p>
+                </div>
+                <div class="example-box">
+                    <h3>Пример:</h3>
+                    <p><code>[5, 8, 3, 9, 5]</code></p>
+                    <p>Сортируем: <code>[3, 5, 5, 8, 9]</code></p>
+                    <p>Средний элемент: <strong>5</strong></p>
+                </div>
+                <button onclick="calculateMedianInteractive()" class="action-btn">Посчитать</button>
+                <div id="median-result" class="result-box"></div>
+            </div>
+
+            <!-- Слайд 6: Мода -->
+            <div class="slide" id="slide6">
+                <h2>Мода</h2>
+                <div class="definition-card">
+                    <p>Значение, которое встречается в выборке наиболее часто.</p>
+                </div>
+                <div class="example-box">
+                    <h3>Пример:</h3>
+                    <p><code>[5, 8, 3, 9, 5, 5]</code></p>
+                    <p>Частоты: 5→3, 8→1, 3→1, 9→1</p>
+                    <p>Мода = <strong>5</strong></p>
+                </div>
+                <button onclick="calculateModeInteractive()" class="action-btn">Посчитать</button>
+                <div id="mode-result" class="result-box"></div>
+            </div>
+
+            <!-- Слайд 7: Минимум и максимум -->
+            <div class="slide" id="slide7">
+                <h2>Минимум и максимум</h2>
+                <div class="definition-card">
+                    <p><strong>Минимум</strong> — наименьшее значение.</p>
+                    <p><strong>Максимум</strong> — наибольшее значение.</p>
+                </div>
+                <div class="example-box">
+                    <h3>Пример:</h3>
+                    <p><code>[5, 8, 3, 9, 5]</code></p>
+                    <p>Минимум = <strong>3</strong></p>
+                    <p>Максимум = <strong>9</strong></p>
+                </div>
+                <button onclick="calculateMinMaxInteractive()" class="action-btn">Посчитать</button>
+                <div id="minmax-result" class="result-box"></div>
+            </div>
+
+            <!-- Слайд 8: Размах -->
+            <div class="slide" id="slide8">
+                <h2>Размах</h2>
+                <div class="definition-card">
+                    <p>Разность между максимальным и минимальным значениями.</p>
+                    <div class="formula">$$R = x_{\max} - x_{\min}$$</div>
+                </div>
+                <div class="example-box">
+                    <h3>Пример:</h3>
+                    <p><code>[5, 8, 3, 9, 5]</code></p>
+                    <p>$$\text{max} = 9, \quad \text{min} = 3$$</p>
+                    <p>Размах = $$9 - 3 = 6$$</p>
+                </div>
+                <button onclick="calculateRangeInteractive()" class="action-btn">Посчитать</button>
+                <div id="range-result" class="result-box"></div>
+            </div>
+
+            <!-- Слайд 9: Дисперсия -->
+            <div class="slide" id="slide9">
+                <h2>Дисперсия</h2>
+                <div class="definition-card">
+                    <p>Среднее арифметическое квадратов отклонений от среднего.</p>
+                    <div class="formula">$$s^2 = \frac{1}{n}\sum_{i=1}^{n} (x_i - \bar{x})^2$$</div>
+                </div>
+                <div class="example-box">
+                    <h3>Пример:</h3>
+                    <p><code>[5, 8, 3, 9, 5]</code>, среднее = 6</p>
+                    <p>Квадраты отклонений: 1, 4, 9, 9, 1</p>
+                    <p>Сумма = 24, Дисперсия = $$\frac{24}{5} = 4.8$$</p>
+                </div>
+                <button onclick="calculateVarianceInteractive()" class="action-btn">Посчитать</button>
+                <div id="variance-result" class="result-box"></div>
+            </div>
+
+            <!-- Слайд 10: Картинка 1 (Пустой слайд для картинки) -->
+            <div class="slide" id="slide10">
+    <h2>Графическое представление данных</h2>
+    <div class="image-container">
+        <img src="images/10sld.jpg" 
+             alt="Статистическая диаграмма"
+             class="presentation-image"
+             style="max-width: 90%; max-height: 400px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+    </div>
+</div>
+            <!-- Слайд 11: Нормальное распределение -->
+            <div class="slide" id="slide11">
+                <h2>Нормальное распределение</h2>
+                <div class="definition-card">
+                    <p>Распределение Гаусса, график имеет форму колокола.</p>
+                    <div class="formula">$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$</div>
+                </div>
+                <div class="content-box">
+                    <h3>Примеры:</h3>
+                    <ul>
+                        <li>Рост людей</li>
+                        <li>Ошибки измерений</li>
+                        <li>IQ показатели</li>
+                    </ul>
+                </div>
+                <div class="graph-box">
+                    <canvas id="normal-distribution-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Слайд 12: JavaScript: Выборочная средняя -->
+            <div class="slide" id="slide12">
+                <h2>JavaScript: Выборочная средняя</h2>
+                <div class="code-block">
+<pre>
+function calculateMean(data) {
+    if (data.length === 0) return 0;
+    const sum = data.reduce((a, b) => a + b, 0);
+    return sum / data.length;
+}
+
+// Пример использования
+const numbers = [5, 8, 3, 9, 5];
+const mean = calculateMean(numbers);
+console.log(mean); // 6
+</pre>
+                </div>
+            </div>
+
+            <!-- Слайд 13: JavaScript: Медиана -->
+            <div class="slide" id="slide13">
+                <h2>JavaScript: Медиана</h2>
+                <div class="code-block">
+<pre>
+function calculateMedian(data) {
+    if (data.length === 0) return 0;
+    const sorted = [...data].sort((a, b) => a - b);
+    const middle = Math.floor(sorted.length / 2);
+    
+    if (sorted.length % 2 === 0) {
+        return (sorted[middle - 1] + sorted[middle]) / 2;
+    } else {
+        return sorted[middle];
+    }
+}
+</pre>
+                </div>
+            </div>
+
+            <!-- Слайд 14: JavaScript: Дисперсия -->
+            <div class="slide" id="slide14">
+                <h2>JavaScript: Дисперсия</h2>
+                <div class="code-block">
+<pre>
+function calculateVariance(data) {
+    if (data.length === 0) return 0;
+    
+    const mean = calculateMean(data);
+    const sumSquaredDiffs = data.reduce((sum, value) => {
+        return sum + Math.pow(value - mean, 2);
+    }, 0);
+    
+    return sumSquaredDiffs / data.length;
+}
+</pre>
+                </div>
+            </div>
+
+            <!-- Слайд 15: Картинка 2 (Пустой слайд для картинки) -->
+            <div class="slide" id="slide15">
+    <h2>Графическое представление данных</h2>
+    <div class="image-container">
+        <img src="images/15sld.jpg" 
+             alt="Статистическая диаграмма"
+             class="presentation-image"
+             style="max-width: 90%; max-height: 500px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+    </div>
+</div>
+           <!-- Слайд 16: Игра "Подбрось монетку" -->
+<div class="slide" id="slide16">
+    <h2 style="margin-bottom: 15px;">Игра "Подбрось монетку"</h2>
+    
+    <div style="
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        max-width: 900px;
+        margin: 0 auto;
+        height: 65vh;
+        align-items: center;
+    ">
+        <!-- Левая часть - игра -->
+        <div style="text-align: center;">
+            <div class="coin" id="coin-element" style="
+                width: 120px;
+                height: 120px;
+                margin: 0 auto 20px;
+            ">
+                <div class="coin-front" style="font-size: 1.1em;">ОРЁЛ</div>
+                <div class="coin-back" style="font-size: 1.1em;">РЕШКА</div>
+            </div>
+            
+            <div style="margin: 15px 0;">
+                <button onclick="flipCoinGame()" class="action-btn" style="
+                    padding: 8px 16px;
+                    font-size: 0.9em;
+                    margin: 0 5px;
+                ">Подбросить</button>
+                <button onclick="resetCoinStats()" class="action-btn reset" style="
+                    padding: 8px 16px;
+                    font-size: 0.9em;
+                    margin: 0 5px;
+                ">Сбросить</button>
+            </div>
+            
+            <div class="stats" style="
+                padding: 12px;
+                font-size: 0.9em;
+                gap: 15px;
+                max-width: 300px;
+                margin: 15px auto;
+            ">
+                <div>Бросков: <span id="total-flips">0</span></div>
+                <div>Орёл: <span id="heads-count">0</span></div>
+                <div>Решка: <span id="tails-count">0</span></div>
+            </div>
+        </div>
+        
+        <!-- Правая часть - теория -->
+        <div>
+            <div class="content-box">
+                <h3>Статистика эксперимента:</h3>
+                <p>Вероятность выпадения орла:</p>
+                <div style="
+                    background: #e8f4fc;
+                    padding: 10px;
+                    border-radius: 5px;
+                    margin: 10px 0;
+                    font-family: monospace;
+                ">
+                    P(орёл) = <span id="heads-count2">0</span> / <span id="total-flips2">0</span> = <span id="probability">0</span>%
+                </div>
+                
+                <h3>Закон больших чисел:</h3>
+                <ul>
+                    <li>При 10 бросках: может быть 7 орлов (70%)</li>
+                    <li>При 100 бросках: ~52-55 орлов</li>
+                    <li>При 1000 бросках: ~495-505 орлов</li>
+                    <li>Чем больше испытаний, тем ближе к 50%</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Обновляем правую часть
+function updateProbability() {
+    const total = parseInt(document.getElementById('total-flips').textContent) || 0;
+    const heads = parseInt(document.getElementById('heads-count').textContent) || 0;
+    
+    if (total > 0) {
+        const probability = ((heads / total) * 100).toFixed(1);
+        document.getElementById('probability').textContent = probability;
+        document.getElementById('heads-count2').textContent = heads;
+        document.getElementById('total-flips2').textContent = total;
+    }
+}
+
+// Модифицируем существующие функции
+const originalFlipCoinGame = window.flipCoinGame;
+window.flipCoinGame = function() {
+    originalFlipCoinGame();
+    setTimeout(updateProbability, 1100);
+};
+
+const originalUpdateCoinDisplay = window.updateCoinDisplay;
+window.updateCoinDisplay = function() {
+    originalUpdateCoinDisplay();
+    updateProbability();
+};
+</script>
+            <!-- Слайд 17: Диаграмма выборки -->
+            <div class="slide" id="slide17">
+                <h2>Диаграмма случайной выборки</h2>
+                <p>1000 элементов от 1 до 100</p>
+                <button onclick="generateSampleChart()" class="action-btn">Сгенерировать</button>
+                <div class="chart-container">
+                    <canvas id="sample-chart"></canvas>
+                </div>
+                <div class="chart-stats">
+                    <div>Среднее: <span id="chart-mean">0</span></div>
+                    <div>Медиана: <span id="chart-median">0</span></div>
+                    <div>Дисперсия: <span id="chart-variance">0</span></div>
+                </div>
+            </div>
+
+            <!-- Слайд 18: Математическое ожидание -->
+            <div class="slide" id="slide18">
+                <h2>Математическое ожидание</h2>
+                <div class="definition-card">
+                    <p>Среднее значение случайной величины.</p>
+                    <div class="formula">$$E[X] = \sum_{i=1}^{n} x_i \times p_i$$</div>
+                </div>
+                <div class="example-box">
+                    <h3>Пример: Игральная кость</h3>
+                    <p>Возможные значения: 1, 2, 3, 4, 5, 6</p>
+                    <p>Вероятности: $$p_i = \frac{1}{6}$$</p>
+                    <p>$$E[X] = \frac{1+2+3+4+5+6}{6} = 3.5$$</p>
+                </div>
+            </div>
+
+            <!-- Слайд 19: Дисперсия случайной величины -->
+            <div class="slide" id="slide19">
+                <h2>Дисперсия случайной величины</h2>
+                <div class="definition-card">
+                    <p>Мера разброса значений относительно мат. ожидания.</p>
+                    <div class="formula">$$D[X] = E[X^2] - (E[X])^2$$</div>
+                </div>
+                <div class="example-box">
+                    <h3>Пример: Игральная кость</h3>
+                    <p>$$E[X] = 3.5$$</p>
+                    <p>$$E[X^2] = \frac{1+4+9+16+25+36}{6} \approx 15.167$$</p>
+                    <p>$$D[X] = 15.167 - 3.5^2 = 2.917$$</p>
+                </div>
+            </div>
+
+            <!-- Слайд 20: Картинка 3 (Пустой слайд для картинки) -->
+           <div class="slide" id="slide20">
+    <h2>Графическое представление данных</h2>
+    <div class="image-container">
+        <img src="images/20sld.jpg" 
+             alt="Статистическая диаграмма"
+             class="presentation-image"
+             style="max-width: 90%; max-height: 400px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+    </div>
+</div>
+
+            <!-- Слайд 21: Стандартное отклонение -->
+            <div class="slide" id="slide21">
+                <h2>Стандартное отклонение</h2>
+                <div class="definition-card">
+                    <p>Корень квадратный из дисперсии.</p>
+                    <div class="formula">$$\sigma = \sqrt{D[X]}$$</div>
+                </div>
+                <div class="example-box">
+                    <h3>Пример:</h3>
+                    <p>Для выборки [5, 8, 3, 9, 5]:</p>
+                    <p>Дисперсия = 4.8</p>
+                    <p>Стандартное отклонение = $$\sqrt{4.8} \approx 2.19$$</p>
+                </div>
+            </div>
+
+            <!-- Слайд 22: Заключение -->
+            <div class="slide" id="slide22">
+                <h1>Спасибо за внимание!</h1>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
