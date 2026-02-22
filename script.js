@@ -1,402 +1,296 @@
-// ОСНОВНАЯ ПРОБЛЕМА: функция showSlide должна правильно скрывать/показывать слайды
-
+// ============= ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =============
 let currentSlide = 1;
 const totalSlides = 22;
 let chartInstances = {};
 
-// Инициализация - ДОЛЖНА ВЫЗЫВАТЬСЯ ПОСЛЕ ЗАГРУЗКИ DOM
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM загружен, инициализация...');
-    
-    // Сначала скроем все слайды
-    const slides = document.querySelectorAll('.slide');
-    slides.forEach(slide => {
-        slide.style.display = 'none';
-    });
-    
-    // Покажем первый слайд
-    showSlide(1);
-    
-    // Настройка остального функционала
-    setupKeyboardNavigation();
-    loadCoinGameStats();
-    
-    // Инициализируем формулы с задержкой для полной загрузки KaTeX
-    setTimeout(() => {
-        renderMathFormulas();
-    }, 500);
-    
-    // Инициализируем графики
-    setTimeout(() => {
-        renderNormalDistributionChart();
-    }, 700);
-    
-    console.log('Инициализация завершена');
-});
-
-// Функция отображения слайда - ИСПРАВЛЕНА
+// ============= НАВИГАЦИЯ ПО СЛАЙДАМ =============
 function showSlide(n) {
-    console.log('Показать слайд:', n);
+    console.log('Показываем слайд:', n);
     
-    // Проверяем границы
+    // Проверка границ
     if (n < 1) n = 1;
     if (n > totalSlides) n = totalSlides;
     
     // Скрываем все слайды
-    const slides = document.querySelectorAll('.slide');
-    slides.forEach(slide => {
-        slide.style.display = 'none';
+    document.querySelectorAll('.slide').forEach(slide => {
         slide.classList.remove('active');
+        slide.style.display = 'none';
     });
     
     // Показываем нужный слайд
-    const slideToShow = document.getElementById(`slide${n}`);
-    if (slideToShow) {
-        slideToShow.style.display = 'flex';
-        slideToShow.classList.add('active');
+    const activeSlide = document.getElementById(`slide${n}`);
+    if (activeSlide) {
+        activeSlide.classList.add('active');
+        activeSlide.style.display = 'flex';
         currentSlide = n;
         
         // Обновляем навигацию
-        document.getElementById('slide-number').textContent = n;
-        document.getElementById('slide-selector').value = n;
+        const slideNumber = document.getElementById('slide-number');
+        if (slideNumber) {
+            slideNumber.textContent = `${currentSlide}/${totalSlides}`;
+        }
         
-        console.log('Слайд', n, 'показан');
+        const selector = document.getElementById('slide-selector');
+        if (selector) {
+            selector.value = currentSlide;
+        }
         
-        // Перерисовываем формулы при переходе на слайд
-        setTimeout(() => {
-            renderMathFormulas();
-        }, 100);
-        
-        // Перерисовываем графики при переходе на слайд
+        // Перерисовываем графики при необходимости
         if (n === 11) {
-            setTimeout(() => {
-                renderNormalDistributionChart();
-            }, 200);
+            setTimeout(() => renderNormalDistributionChart(), 200);
+        }
+        if (n === 17) {
+            setTimeout(() => generateSampleChart(), 200);
         }
     } else {
         console.error('Слайд не найден:', n);
     }
 }
 
-// Простая навигация
 function nextSlide() {
-    console.log('Следующий слайд');
     if (currentSlide < totalSlides) {
         showSlide(currentSlide + 1);
     }
 }
 
 function prevSlide() {
-    console.log('Предыдущий слайд');
     if (currentSlide > 1) {
         showSlide(currentSlide - 1);
     }
 }
 
-function goToSlide(n) {
-    const slideNum = parseInt(n);
+function goToSlide(value) {
+    const slideNum = parseInt(value);
     if (slideNum >= 1 && slideNum <= totalSlides) {
         showSlide(slideNum);
     }
 }
 
-// Управление с клавиатуры
-function setupKeyboardNavigation() {
-    document.addEventListener('keydown', function(e) {
-        switch(e.key) {
-            case 'ArrowLeft':
-            case 'PageUp':
-                prevSlide();
-                break;
-            case 'ArrowRight':
-            case 'PageDown':
-            case ' ':
-                if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT') {
-                    nextSlide();
-                    e.preventDefault();
-                }
-                break;
-            case 'Home':
-                showSlide(1);
-                break;
-            case 'End':
-                showSlide(totalSlides);
-                break;
-        }
-    });
-}
-
-// Интерактивные расчеты - ПРОСТЫЕ ФУНКЦИИ
+// ============= ИНТЕРАКТИВНЫЕ РАСЧЕТЫ =============
+// Слайд 4: Выборочная средняя
 function calculateMeanInteractive() {
     const numbers = [5, 8, 3, 9, 5];
     const mean = numbers.reduce((a, b) => a + b, 0) / numbers.length;
-    document.getElementById('mean-result').innerHTML = 
-        `<strong>Выборка:</strong> [${numbers.join(', ')}]<br>
-         <strong>Среднее:</strong> ${mean}`;
+    const resultBox = document.getElementById('mean-result');
+    if (resultBox) {
+        resultBox.innerHTML = `
+            <strong>Выборка:</strong> [${numbers.join(', ')}]<br>
+            <strong>Среднее арифметическое:</strong> ${mean.toFixed(2)}<br>
+            <strong>Формула:</strong> (5 + 8 + 3 + 9 + 5) / 5 = ${mean}
+        `;
+        resultBox.style.backgroundColor = '#d4edda';
+    }
 }
 
+// Слайд 5: Медиана
 function calculateMedianInteractive() {
     const numbers = [5, 8, 3, 9, 5];
     const sorted = [...numbers].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
     const median = sorted.length % 2 === 0 ? 
-        (sorted[mid-1] + sorted[mid]) / 2 : sorted[mid];
-    document.getElementById('median-result').innerHTML = 
-        `<strong>Выборка:</strong> [${numbers.join(', ')}]<br>
-         <strong>Сортировка:</strong> [${sorted.join(', ')}]<br>
-         <strong>Медиана:</strong> ${median}`;
+        (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+    
+    const resultBox = document.getElementById('median-result');
+    if (resultBox) {
+        resultBox.innerHTML = `
+            <strong>Выборка:</strong> [${numbers.join(', ')}]<br>
+            <strong>Отсортированная:</strong> [${sorted.join(', ')}]<br>
+            <strong>Медиана:</strong> ${median}
+        `;
+        resultBox.style.backgroundColor = '#d4edda';
+    }
 }
 
+// Слайд 6: Мода
 function calculateModeInteractive() {
     const numbers = [5, 8, 3, 9, 5, 5];
     const freq = {};
     numbers.forEach(n => freq[n] = (freq[n] || 0) + 1);
     const maxFreq = Math.max(...Object.values(freq));
-    const mode = Object.keys(freq).filter(k => freq[k] === maxFreq).map(Number);
-    document.getElementById('mode-result').innerHTML = 
-        `<strong>Выборка:</strong> [${numbers.join(', ')}]<br>
-         <strong>Мода:</strong> ${mode.join(', ')}`;
+    const modes = Object.keys(freq).filter(k => freq[k] === maxFreq).map(Number);
+    
+    const resultBox = document.getElementById('mode-result');
+    if (resultBox) {
+        resultBox.innerHTML = `
+            <strong>Выборка:</strong> [${numbers.join(', ')}]<br>
+            <strong>Частоты:</strong> ${Object.entries(freq).map(([k, v]) => `${k}→${v}`).join(', ')}<br>
+            <strong>Мода:</strong> ${modes.join(', ')} (встречается ${maxFreq} раз)
+        `;
+        resultBox.style.backgroundColor = '#d4edda';
+    }
 }
 
+// Слайд 7: Минимум и максимум
 function calculateMinMaxInteractive() {
     const numbers = [5, 8, 3, 9, 5];
     const min = Math.min(...numbers);
     const max = Math.max(...numbers);
-    document.getElementById('minmax-result').innerHTML = 
-        `<strong>Выборка:</strong> [${numbers.join(', ')}]<br>
-         <strong>Минимум:</strong> ${min}<br>
-         <strong>Максимум:</strong> ${max}`;
+    
+    const resultBox = document.getElementById('minmax-result');
+    if (resultBox) {
+        resultBox.innerHTML = `
+            <strong>Выборка:</strong> [${numbers.join(', ')}]<br>
+            <strong>Минимум:</strong> ${min}<br>
+            <strong>Максимум:</strong> ${max}
+        `;
+        resultBox.style.backgroundColor = '#d4edda';
+    }
 }
 
+// Слайд 8: Размах
 function calculateRangeInteractive() {
     const numbers = [5, 8, 3, 9, 5];
-    const range = Math.max(...numbers) - Math.min(...numbers);
-    document.getElementById('range-result').innerHTML = 
-        `<strong>Выборка:</strong> [${numbers.join(', ')}]<br>
-         <strong>Размах:</strong> ${range}`;
+    const min = Math.min(...numbers);
+    const max = Math.max(...numbers);
+    const range = max - min;
+    
+    const resultBox = document.getElementById('range-result');
+    if (resultBox) {
+        resultBox.innerHTML = `
+            <strong>Выборка:</strong> [${numbers.join(', ')}]<br>
+            <strong>Максимум:</strong> ${max}<br>
+            <strong>Минимум:</strong> ${min}<br>
+            <strong>Размах:</strong> ${max} - ${min} = ${range}
+        `;
+        resultBox.style.backgroundColor = '#d4edda';
+    }
 }
 
+// Слайд 9: Дисперсия
 function calculateVarianceInteractive() {
     const numbers = [5, 8, 3, 9, 5];
     const mean = numbers.reduce((a, b) => a + b, 0) / numbers.length;
-    const variance = numbers.reduce((sum, n) => sum + Math.pow(n - mean, 2), 0) / numbers.length;
-    document.getElementById('variance-result').innerHTML = 
-        `<strong>Выборка:</strong> [${numbers.join(', ')}]<br>
-         <strong>Среднее:</strong> ${mean.toFixed(2)}<br>
-         <strong>Дисперсия:</strong> ${variance.toFixed(2)}`;
+    const squaredDiffs = numbers.map(n => Math.pow(n - mean, 2));
+    const variance = squaredDiffs.reduce((a, b) => a + b, 0) / numbers.length;
+    
+    const resultBox = document.getElementById('variance-result');
+    if (resultBox) {
+        resultBox.innerHTML = `
+            <strong>Выборка:</strong> [${numbers.join(', ')}]<br>
+            <strong>Среднее (x̄):</strong> ${mean.toFixed(2)}<br>
+            <strong>Квадраты отклонений:</strong> [${squaredDiffs.map(d => d.toFixed(2)).join(', ')}]<br>
+            <strong>Дисперсия:</strong> ${variance.toFixed(2)}
+        `;
+        resultBox.style.backgroundColor = '#d4edda';
+    }
 }
 
-// Игра с монеткой - УПРОЩЕННАЯ ВЕРСИЯ
-let coinGameStats = {
-    total: 0,
+// ============= ИГРА С МОНЕТКОЙ =============
+let coinStats = {
     heads: 0,
-    tails: 0
+    tails: 0,
+    total: 0
 };
 
-function loadCoinGameStats() {
+// Загружаем статистику при старте
+function loadCoinStats() {
     try {
-        const savedStats = localStorage.getItem('coinGameStats');
-        if (savedStats) {
-            coinGameStats = JSON.parse(savedStats);
-            updateCoinGameDisplay();
-            updateProbability();
+        const saved = localStorage.getItem('coinStats');
+        if (saved) {
+            coinStats = JSON.parse(saved);
+            updateCoinDisplay();
         }
     } catch (e) {
-        console.log('Не удалось загрузить статистику игры');
+        console.log('Не удалось загрузить статистику');
     }
 }
 
-function saveCoinGameStats() {
+// Сохраняем статистику
+function saveCoinStats() {
     try {
-        localStorage.setItem('coinGameStats', JSON.stringify(coinGameStats));
+        localStorage.setItem('coinStats', JSON.stringify(coinStats));
     } catch (e) {
-        console.log('Не удалось сохранить статистику игры');
-    }
-}
-
-function updateCoinGameDisplay() {
-    const totalEl = document.getElementById('total-flips');
-    const headsEl = document.getElementById('heads-count');
-    const tailsEl = document.getElementById('tails-count');
-    
-    if (totalEl) totalEl.textContent = coinGameStats.total;
-    if (headsEl) headsEl.textContent = coinGameStats.heads;
-    if (tailsEl) tailsEl.textContent = coinGameStats.tails;
-}
-
-function updateProbability() {
-    const total = coinGameStats.total;
-    const heads = coinGameStats.heads;
-    
-    if (total > 0) {
-        const probability = ((heads / total) * 100).toFixed(1);
-        const heads2El = document.getElementById('heads-count2');
-        const total2El = document.getElementById('total-flips2');
-        const probEl = document.getElementById('probability');
-        
-        if (heads2El) heads2El.textContent = heads;
-        if (total2El) total2El.textContent = total;
-        if (probEl) probEl.textContent = probability;
-    } else {
-        const heads2El = document.getElementById('heads-count2');
-        const total2El = document.getElementById('total-flips2');
-        const probEl = document.getElementById('probability');
-        
-        if (heads2El) heads2El.textContent = '0';
-        if (total2El) total2El.textContent = '0';
-        if (probEl) probEl.textContent = '0';
+        console.log('Не удалось сохранить статистику');
     }
 }
 
 function flipCoinGame() {
-    const coin = document.getElementById('coin-element');
+    const coin = document.querySelector('.coin');
     if (!coin) return;
+    
+    // Защита от множественных кликов
+    if (coin.classList.contains('flipping')) return;
     
     coin.classList.add('flipping');
     
+    // Определяем результат
     const isHeads = Math.random() < 0.5;
     
     setTimeout(() => {
-        coinGameStats.total++;
+        coin.classList.remove('flipping');
+        
+        // Обновляем статистику
+        coinStats.total++;
         if (isHeads) {
-            coinGameStats.heads++;
+            coinStats.heads++;
             coin.style.transform = 'rotateY(0deg)';
         } else {
-            coinGameStats.tails++;
+            coinStats.tails++;
             coin.style.transform = 'rotateY(180deg)';
         }
         
-        saveCoinGameStats();
-        updateCoinGameDisplay();
-        updateProbability();
-        coin.classList.remove('flipping');
+        // Сохраняем и обновляем отображение
+        saveCoinStats();
+        updateCoinDisplay();
+        
+        // Показываем результат
+        const lastResult = document.getElementById('last-result');
+        if (lastResult) {
+            lastResult.textContent = isHeads ? 'ОРЁЛ' : 'РЕШКА';
+        }
+        
     }, 600);
 }
 
+function updateCoinDisplay() {
+    // Обновляем счетчики
+    const totalEl = document.getElementById('total-flips');
+    const headsEl = document.getElementById('heads-count');
+    const tailsEl = document.getElementById('tails-count');
+    const heads2El = document.getElementById('heads-count2');
+    const total2El = document.getElementById('total-flips2');
+    const probEl = document.getElementById('probability');
+    
+    if (totalEl) totalEl.textContent = coinStats.total;
+    if (headsEl) headsEl.textContent = coinStats.heads;
+    if (tailsEl) tailsEl.textContent = coinStats.tails;
+    
+    // Обновляем вероятности
+    if (heads2El) heads2El.textContent = coinStats.heads;
+    if (total2El) total2El.textContent = coinStats.total;
+    
+    if (probEl && coinStats.total > 0) {
+        const prob = (coinStats.heads / coinStats.total * 100).toFixed(1);
+        probEl.textContent = prob + '%';
+    } else if (probEl) {
+        probEl.textContent = '0%';
+    }
+}
+
 function resetCoinStats() {
-    coinGameStats = { total: 0, heads: 0, tails: 0 };
-    saveCoinGameStats();
-    updateCoinGameDisplay();
-    updateProbability();
-    const coin = document.getElementById('coin-element');
+    coinStats = { heads: 0, tails: 0, total: 0 };
+    saveCoinStats();
+    updateCoinDisplay();
+    
+    const lastResult = document.getElementById('last-result');
+    if (lastResult) {
+        lastResult.textContent = '-';
+    }
+    
+    const coin = document.querySelector('.coin');
     if (coin) {
         coin.style.transform = 'rotateY(0deg)';
     }
 }
 
-// Диаграмма случайной выборки
-function generateSampleChart() {
-    const sampleSize = 1000;
-    const minValue = 1;
-    const maxValue = 100;
-    
-    // Генерация случайной выборки
-    const sample = [];
-    for (let i = 0; i < sampleSize; i++) {
-        sample.push(Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue);
-    }
-    
-    // Расчет статистик
-    const mean = sample.reduce((a, b) => a + b, 0) / sample.length;
-    const sorted = [...sample].sort((a, b) => a - b);
-    const median = sorted.length % 2 === 0 ? 
-        (sorted[sorted.length/2 - 1] + sorted[sorted.length/2]) / 2 : 
-        sorted[Math.floor(sorted.length/2)];
-    const variance = sample.reduce((sum, n) => sum + Math.pow(n - mean, 2), 0) / sample.length;
-    
-    // Обновление статистик
-    const meanEl = document.getElementById('chart-mean');
-    const medianEl = document.getElementById('chart-median');
-    const varianceEl = document.getElementById('chart-variance');
-    
-    if (meanEl) meanEl.textContent = mean.toFixed(2);
-    if (medianEl) medianEl.textContent = median.toFixed(2);
-    if (varianceEl) varianceEl.textContent = variance.toFixed(2);
-    
-    // Создание гистограммы
-    const binCount = 10;
-    const binSize = (maxValue - minValue + 1) / binCount;
-    const bins = Array(binCount).fill(0);
-    const binLabels = [];
-    
-    for (let i = 0; i < binCount; i++) {
-        const start = minValue + i * binSize;
-        const end = start + binSize - 1;
-        binLabels.push(`${Math.floor(start)}-${Math.floor(end)}`);
-    }
-    
-    sample.forEach(value => {
-        const binIndex = Math.min(
-            Math.floor((value - minValue) / binSize), 
-            binCount - 1
-        );
-        bins[binIndex]++;
-    });
-    
-    // Создание графика
-    const canvas = document.getElementById('sample-chart');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    
-    // Уничтожаем старый график
-    if (chartInstances.sampleChart) {
-        chartInstances.sampleChart.destroy();
-    }
-    
-    chartInstances.sampleChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: binLabels,
-            datasets: [{
-                label: 'Количество',
-                data: bins,
-                backgroundColor: 'rgba(52, 152, 219, 0.7)',
-                borderColor: 'rgba(52, 152, 219, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                title: {
-                    display: true,
-                    text: 'Гистограмма случайной выборки (1000 элементов)',
-                    font: {
-                        size: 14
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Частота'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Диапазон значений'
-                    }
-                }
-            }
-        }
-    });
-}
-
-// График нормального распределения
+// ============= ГРАФИКИ =============
 function renderNormalDistributionChart() {
     const canvas = document.getElementById('normal-distribution-chart');
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
     
+    // Генерируем данные для нормального распределения
     const data = [];
     for (let x = -3; x <= 3; x += 0.1) {
         data.push({
@@ -405,6 +299,7 @@ function renderNormalDistributionChart() {
         });
     }
     
+    // Уничтожаем старый график
     if (chartInstances.normalChart) {
         chartInstances.normalChart.destroy();
     }
@@ -419,108 +314,215 @@ function renderNormalDistributionChart() {
                 backgroundColor: 'rgba(52, 152, 219, 0.1)',
                 borderWidth: 2,
                 fill: true,
-                tension: 0.4
+                tension: 0.4,
+                pointRadius: 0
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    display: false
+                legend: { display: false },
+                title: { 
+                    display: true, 
+                    text: 'График плотности нормального распределения',
+                    font: { size: 14 }
                 }
             },
             scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'x'
-                    }
+                x: { 
+                    title: { display: true, text: 'x (σ)' },
+                    grid: { color: 'rgba(0,0,0,0.1)' }
                 },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'f(x)'
-                    },
-                    beginAtZero: true
+                y: { 
+                    title: { display: true, text: 'f(x)' },
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.1)' }
                 }
             }
         }
     });
 }
 
-// ИСПРАВЛЕННАЯ функция рендеринга формул KaTeX
+function generateSampleChart() {
+    const canvas = document.getElementById('sample-chart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const sampleSize = 1000;
+    
+    // Генерируем выборку
+    const sample = [];
+    for (let i = 0; i < sampleSize; i++) {
+        sample.push(Math.floor(Math.random() * 100) + 1);
+    }
+    
+    // Строим гистограмму
+    const bins = Array(10).fill(0);
+    sample.forEach(val => {
+        const binIndex = Math.floor((val - 1) / 10);
+        if (binIndex >= 0 && binIndex < 10) bins[binIndex]++;
+    });
+    
+    const labels = ['1-10', '11-20', '21-30', '31-40', '41-50', 
+                    '51-60', '61-70', '71-80', '81-90', '91-100'];
+    
+    // Вычисляем статистики
+    const mean = sample.reduce((a, b) => a + b, 0) / sample.length;
+    const sorted = [...sample].sort((a, b) => a - b);
+    const median = sorted[Math.floor(sample.length / 2)];
+    const variance = sample.reduce((sum, n) => sum + Math.pow(n - mean, 2), 0) / sample.length;
+    
+    // Обновляем статистики
+    const meanEl = document.getElementById('chart-mean');
+    const medianEl = document.getElementById('chart-median');
+    const varianceEl = document.getElementById('chart-variance');
+    
+    if (meanEl) meanEl.textContent = mean.toFixed(2);
+    if (medianEl) medianEl.textContent = median.toFixed(2);
+    if (varianceEl) varianceEl.textContent = variance.toFixed(2);
+    
+    // Уничтожаем старый график
+    if (chartInstances.sampleChart) {
+        chartInstances.sampleChart.destroy();
+    }
+    
+    chartInstances.sampleChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Частота',
+                data: bins,
+                backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: { 
+                    display: true, 
+                    text: 'Гистограмма случайной выборки (1000 элементов)',
+                    font: { size: 14 }
+                }
+            },
+            scales: {
+                y: { 
+                    beginAtZero: true,
+                    title: { display: true, text: 'Количество' }
+                }
+            }
+        }
+    });
+}
+
+// ============= ФОРМУЛЫ =============
 function renderMathFormulas() {
-    // Проверяем, загружен ли KaTeX
     if (typeof katex === 'undefined') {
-        console.warn('⚠️ KaTeX не загружен, ожидаем...');
-        // Пробуем снова через секунду
-        setTimeout(renderMathFormulas, 1000);
+        console.warn('KaTeX не загружен');
+        setTimeout(renderMathFormulas, 500);
         return;
     }
     
-    console.log('📐 Рендеринг формул KaTeX...');
-    
-    // Находим все элементы с формулами
-    const formulaElements = document.querySelectorAll('.formula');
-    
-    formulaElements.forEach(el => {
-        // Сохраняем исходный текст
-        const originalText = el.textContent.trim();
-        
-        // Очищаем содержимое
-        el.innerHTML = '';
-        
-        try {
-            // Рендерим формулу
-            katex.render(originalText, el, {
-                throwOnError: false,
-                displayMode: true,
-                output: 'html',
-                fleqn: false,
-                leqno: false,
-                trust: true,
-                macros: {
-                    "\\bar": "\\overline"
-                }
-            });
-            console.log('✅ Формула отрендерена:', originalText.substring(0, 30) + '...');
-        } catch (e) {
-            console.warn('❌ Ошибка рендеринга формулы:', originalText, e);
-            // В случае ошибки показываем исходный текст
-            el.innerHTML = `<span style="color: red; font-family: monospace;">${originalText}</span>`;
-        }
-    });
-    
-    // Дополнительно обрабатываем формулы в примерах
-    document.querySelectorAll('.example-box .formula').forEach(el => {
-        if (!el.hasChildNodes() || el.children.length === 0) {
-            const text = el.textContent.trim();
-            if (text) {
-                try {
-                    katex.render(text, el, { throwOnError: false, displayMode: true });
-                } catch (e) {
-                    console.warn('Ошибка в дополнительной формуле:', e);
-                }
+    document.querySelectorAll('.formula').forEach(el => {
+        const formula = el.textContent.trim();
+        if (formula) {
+            try {
+                katex.render(formula, el, {
+                    throwOnError: false,
+                    displayMode: true
+                });
+            } catch (e) {
+                console.warn('Ошибка рендеринга:', formula);
+                el.innerHTML = `<code>${formula}</code>`;
             }
         }
     });
-    
-    console.log(`✅ Обработано формул: ${formulaElements.length}`);
 }
 
-// Экспортируем функции для отладки
-window.showSlide = showSlide;
+// ============= ИНИЦИАЛИЗАЦИЯ =============
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Инициализация презентации...');
+    
+    // Показываем первый слайд
+    showSlide(1);
+    
+    // Настройка навигации
+    const nextBtn = document.getElementById('next-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    
+    if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+    if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+    
+    // Заполняем выпадающий список
+    const selector = document.getElementById('slide-selector');
+    if (selector) {
+        selector.innerHTML = '';
+        for (let i = 1; i <= totalSlides; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `Слайд ${i}`;
+            selector.appendChild(option);
+        }
+        selector.addEventListener('change', (e) => goToSlide(e.target.value));
+    }
+    
+    // Клавиатурная навигация
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            nextSlide();
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            prevSlide();
+        }
+    });
+    
+    // Загружаем статистику монетки
+    loadCoinStats();
+    updateCoinDisplay();
+    
+    // Добавляем last-result если его нет
+    if (!document.getElementById('last-result')) {
+        const coinSection = document.querySelector('.game-section');
+        if (coinSection) {
+            const resultDiv = document.createElement('div');
+            resultDiv.id = 'last-result';
+            resultDiv.className = 'probability-box';
+            resultDiv.textContent = '-';
+            resultDiv.style.marginTop = '10px';
+            resultDiv.style.textAlign = 'center';
+            resultDiv.style.fontWeight = 'bold';
+            coinSection.appendChild(resultDiv);
+        }
+    }
+    
+    // Рендерим формулы через небольшую задержку
+    setTimeout(renderMathFormulas, 300);
+    
+    // Инициализируем графики
+    setTimeout(() => {
+        renderNormalDistributionChart();
+        generateSampleChart();
+    }, 500);
+    
+    console.log('Инициализация завершена');
+});
+
+// Делаем функции глобальными
 window.nextSlide = nextSlide;
 window.prevSlide = prevSlide;
 window.goToSlide = goToSlide;
+window.calculateMeanInteractive = calculateMeanInteractive;
+window.calculateMedianInteractive = calculateMedianInteractive;
+window.calculateModeInteractive = calculateModeInteractive;
+window.calculateMinMaxInteractive = calculateMinMaxInteractive;
+window.calculateRangeInteractive = calculateRangeInteractive;
+window.calculateVarianceInteractive = calculateVarianceInteractive;
 window.flipCoinGame = flipCoinGame;
 window.resetCoinStats = resetCoinStats;
-window.updateProbability = updateProbability;
-window.renderMathFormulas = renderMathFormulas; // Добавляем в глобальную область для отладки
-
-// Принудительный рендеринг формул после полной загрузки страницы
-window.addEventListener('load', function() {
-    console.log('✅ Страница полностью загружена, финальный рендеринг формул...');
-    setTimeout(renderMathFormulas, 500);
-});
+window.generateSampleChart = generateSampleChart;
