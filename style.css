@@ -115,7 +115,8 @@ body {
     padding: 30px;
     display: none;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto;
+    background: white;
 }
 
 .slide.active {
@@ -253,11 +254,12 @@ h3 {
     align-items: center;
     overflow: hidden;
     margin: 10px 0;
+    min-height: 300px;
 }
 
 .presentation-image {
     max-width: 90%;
-    max-height: 70vh;
+    max-height: 60vh;
     object-fit: contain;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
@@ -304,12 +306,13 @@ h3 {
 }
 
 .coin {
-    width: 120px;
-    height: 120px;
-    margin: 15px auto;
+    width: 150px;
+    height: 150px;
+    margin: 20px auto;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.6s;
+    cursor: pointer;
 }
 
 .coin-front, .coin-back {
@@ -343,14 +346,15 @@ h3 {
 
 @keyframes flipCoin {
     0% { transform: rotateY(0deg); }
-    100% { transform: rotateY(1800deg); }
+    100% { transform: rotateY(1440deg); }
 }
 
 .game-buttons {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin: 15px 0;
+    gap: 15px;
+    margin: 20px 0;
+    flex-wrap: wrap;
 }
 
 /* Кнопки */
@@ -410,11 +414,13 @@ h3 {
 /* Вероятность */
 .probability-box {
     background: #e8f4fc;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 12px;
+    border-radius: 8px;
     margin: 10px 0;
     font-family: monospace;
-    font-size: 1.1em;
+    font-size: 1.2em;
+    text-align: center;
+    border: 1px solid var(--secondary);
 }
 
 /* Диаграммы */
@@ -423,6 +429,9 @@ h3 {
     margin: 15px 0;
     position: relative;
     flex-shrink: 0;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 10px;
 }
 
 .chart-stats {
@@ -448,24 +457,38 @@ h3 {
 
 /* График нормального распределения */
 .graph-box {
-    height: 200px;
+    height: 250px;
     margin: 15px 0;
     position: relative;
     flex-shrink: 0;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 10px;
 }
 
 /* Результаты расчетов */
 .result-box {
     background: #e8f4fc;
     border-left: 4px solid var(--secondary);
-    padding: 12px 15px;
+    padding: 15px;
     border-radius: 8px;
-    margin: 10px 0;
-    min-height: 50px;
+    margin: 15px 0;
+    min-height: 60px;
     display: flex;
     align-items: center;
     font-size: 1em;
     flex-shrink: 0;
+    transition: all 0.3s;
+    line-height: 1.6;
+}
+
+#last-result {
+    background: var(--secondary);
+    color: white;
+    font-size: 1.3em;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
 }
 
 /* Заключительный слайд */
@@ -543,8 +566,8 @@ h3 {
     }
     
     .coin {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
     }
     
     h1 {
@@ -567,6 +590,10 @@ h3 {
     .code-block {
         font-size: 0.85em;
         padding: 12px;
+    }
+    
+    .image-container {
+        min-height: 200px;
     }
 }
 
@@ -603,14 +630,19 @@ h3 {
         padding: 8px 16px;
         font-size: 0.85em;
     }
+    
+    .coin {
+        width: 100px;
+        height: 100px;
+    }
 }
 
-/* Скрываем скроллбары для Chrome, Safari и Edge */
+/* Стили для скроллбаров */
 .slide::-webkit-scrollbar,
 .content-box::-webkit-scrollbar,
 .code-block::-webkit-scrollbar,
 .theory-section::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
 }
 
 .slide::-webkit-scrollbar-track,
@@ -618,29 +650,35 @@ h3 {
 .code-block::-webkit-scrollbar-track,
 .theory-section::-webkit-scrollbar-track {
     background: #f1f1f1;
-    border-radius: 3px;
+    border-radius: 4px;
 }
 
 .slide::-webkit-scrollbar-thumb,
 .content-box::-webkit-scrollbar-thumb,
 .code-block::-webkit-scrollbar-thumb,
 .theory-section::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 3px;
+    background: var(--secondary);
+    border-radius: 4px;
 }
 
 .slide::-webkit-scrollbar-thumb:hover,
 .content-box::-webkit-scrollbar-thumb:hover,
 .code-block::-webkit-scrollbar-thumb:hover,
 .theory-section::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: var(--primary);
 }
 
-/* Скрываем скроллбары для Firefox */
+/* Стили для Firefox */
 .slide,
 .content-box,
 .code-block,
 .theory-section {
     scrollbar-width: thin;
-    scrollbar-color: #888 #f1f1f1;
+    scrollbar-color: var(--secondary) #f1f1f1;
+}
+
+/* Дополнительные стили для canvas */
+canvas {
+    max-width: 100%;
+    height: auto !important;
 }
