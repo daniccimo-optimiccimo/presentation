@@ -21,13 +21,15 @@ document.addEventListener('DOMContentLoaded', function() {
     setupKeyboardNavigation();
     loadCoinGameStats();
     
-    // Инициализируем формулы
-    renderMathFormulas();
+    // Инициализируем формулы с задержкой для полной загрузки KaTeX
+    setTimeout(() => {
+        renderMathFormulas();
+    }, 500);
     
     // Инициализируем графики
     setTimeout(() => {
         renderNormalDistributionChart();
-    }, 500);
+    }, 700);
     
     console.log('Инициализация завершена');
 });
@@ -60,11 +62,16 @@ function showSlide(n) {
         
         console.log('Слайд', n, 'показан');
         
+        // Перерисовываем формулы при переходе на слайд
+        setTimeout(() => {
+            renderMathFormulas();
+        }, 100);
+        
         // Перерисовываем графики при переходе на слайд
         if (n === 11) {
             setTimeout(() => {
                 renderNormalDistributionChart();
-            }, 100);
+            }, 200);
         }
     } else {
         console.error('Слайд не найден:', n);
@@ -442,31 +449,64 @@ function renderNormalDistributionChart() {
     });
 }
 
-// Рендеринг формул KaTeX
+// ИСПРАВЛЕННАЯ функция рендеринга формул KaTeX
 function renderMathFormulas() {
+    // Проверяем, загружен ли KaTeX
     if (typeof katex === 'undefined') {
-        console.warn('KaTeX не загружен');
+        console.warn('⚠️ KaTeX не загружен, ожидаем...');
+        // Пробуем снова через секунду
+        setTimeout(renderMathFormulas, 1000);
         return;
     }
     
-    // Ждем немного для загрузки
-    setTimeout(() => {
+    console.log('📐 Рендеринг формул KaTeX...');
+    
+    // Находим все элементы с формулами
+    const formulaElements = document.querySelectorAll('.formula');
+    
+    formulaElements.forEach(el => {
+        // Сохраняем исходный текст
+        const originalText = el.textContent.trim();
+        
+        // Очищаем содержимое
+        el.innerHTML = '';
+        
         try {
-            // Рендерим формулы в .formula элементах
-            document.querySelectorAll('.formula').forEach(el => {
-                try {
-                    katex.render(el.textContent.trim(), el, {
-                        throwOnError: false,
-                        displayMode: true
-                    });
-                } catch (e) {
-                    console.warn('Ошибка рендеринга формулы:', e);
+            // Рендерим формулу
+            katex.render(originalText, el, {
+                throwOnError: false,
+                displayMode: true,
+                output: 'html',
+                fleqn: false,
+                leqno: false,
+                trust: true,
+                macros: {
+                    "\\bar": "\\overline"
                 }
             });
+            console.log('✅ Формула отрендерена:', originalText.substring(0, 30) + '...');
         } catch (e) {
-            console.error('Ошибка в renderMathFormulas:', e);
+            console.warn('❌ Ошибка рендеринга формулы:', originalText, e);
+            // В случае ошибки показываем исходный текст
+            el.innerHTML = `<span style="color: red; font-family: monospace;">${originalText}</span>`;
         }
-    }, 300);
+    });
+    
+    // Дополнительно обрабатываем формулы в примерах
+    document.querySelectorAll('.example-box .formula').forEach(el => {
+        if (!el.hasChildNodes() || el.children.length === 0) {
+            const text = el.textContent.trim();
+            if (text) {
+                try {
+                    katex.render(text, el, { throwOnError: false, displayMode: true });
+                } catch (e) {
+                    console.warn('Ошибка в дополнительной формуле:', e);
+                }
+            }
+        }
+    });
+    
+    console.log(`✅ Обработано формул: ${formulaElements.length}`);
 }
 
 // Экспортируем функции для отладки
@@ -477,3 +517,10 @@ window.goToSlide = goToSlide;
 window.flipCoinGame = flipCoinGame;
 window.resetCoinStats = resetCoinStats;
 window.updateProbability = updateProbability;
+window.renderMathFormulas = renderMathFormulas; // Добавляем в глобальную область для отладки
+
+// Принудительный рендеринг формул после полной загрузки страницы
+window.addEventListener('load', function() {
+    console.log('✅ Страница полностью загружена, финальный рендеринг формул...');
+    setTimeout(renderMathFormulas, 500);
+});
